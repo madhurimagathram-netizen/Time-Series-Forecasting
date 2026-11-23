@@ -1,82 +1,76 @@
-
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, render_template, request
 import numpy as np
 import pandas as pd
 import pickle
-import os
 
 from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
 
-# Allow frontend to connect
-CORS(app)
+# Load Model
+import os
+from tensorflow.keras.models import load_model
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Load trained model
-model = load_model(
-    os.path.join(BASE_DIR, "traffic_forecasting_lstm.keras")
-)
+model_path = os.path.join(BASE_DIR, "traffic_forecasting_lstm.keras")
 
-# Load scaler
+model = load_model(model_path)
+
+# Load Scaler
 with open(os.path.join(BASE_DIR, "scaler.pkl"), "rb") as f:
     scaler = pickle.load(f)
 
-# Load feature columns
 with open(os.path.join(BASE_DIR, "feature_columns.pkl"), "rb") as f:
     feature_columns = pickle.load(f)
 
-
 @app.route("/")
 def home():
-    return jsonify({
-        "message": "Traffic Forecasting API is running!"
-    })
+    return render_template("index.html")
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    try:
-        data = request.get_json()
 
-        input_df = pd.DataFrame([{
-            "temp": float(data["temp"]),
-            "rain_1h": float(data["rain"]),
-            "snow_1h": float(data["snow"]),
-            "clouds_all": int(data["clouds"]),
-            "hour": int(data["hour"]),
-            "day": int(data["day"]),
-            "month": int(data["month"]),
-            "year": int(data["year"])
-        }])
+    temp = float(request.form["temp"])
+    rain = float(request.form["rain"])
+    snow = float(request.form["snow"])
+    clouds = int(request.form["clouds"])
+    hour = int(request.form["hour"])
+    month = int(request.form["month"])
+    day = int(request.form["day"])
+    year = int(request.form["year"])
 
-        for col in feature_columns:
-            if col not in input_df.columns:
-                input_df[col] = 0
+    input_df = pd.DataFrame([{
+        "temp": temp,
+        "rain_1h": rain,
+        "snow_1h": snow,
+        "clouds_all": clouds,
+        "hour": hour,
+        "day": day,
+        "month": month,
+        "year": year
+    }])
 
-        input_df = input_df[feature_columns]
+    # Add missing one-hot encoded columns
+    for col in feature_columns:
+        if col not in input_df.columns:
+            input_df[col] = 0
 
-        input_scaled = scaler.transform(input_df)
+    input_df = input_df[feature_columns]
 
-        input_scaled = np.repeat(
-            input_scaled[:, np.newaxis, :],
-            24,
-            axis=1
-        )
+    input_scaled = scaler.transform(input_df)
 
-        prediction = model.predict(input_scaled)
+    # Create LSTM input
+    input_scaled = np.repeat(input_scaled[np.newaxis,:,:],24,axis=1)
 
-        return jsonify({
-            "prediction": float(prediction[0][0])
-        })
+    prediction = model.predict(input_scaled)
 
-    except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 400
+    return render_template(
+        "index.html",
+        prediction_text=f"Predicted Traffic Volume : {prediction[0][0]:.2f}"
+    )
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(debug=True)
