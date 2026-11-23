@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>AI Powered Traffic Volume Forecasting</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- ================= NAVIGATION BAR ================= -->
+
+    <nav>
+      <div class="logo">
+        <i class="fas fa-road"></i>
+
+        TrafficAI
+      </div>
+
+      <ul>
+        <li><a href="#">Home</a></li>
+
+        <li><a href="#about">About</a></li>
+
+        <li><a href="#prediction">Prediction</a></li>
+
+        <li><a href="#features">Features</a></li>
+
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- ================= HERO SECTION ================= -->
+
+    <section class="hero">
+      <div class="hero-left">
+        <h1>AI Powered Traffic Volume Forecasting</h1>
+
+        <h3>Deep Learning using LSTM</h3>
+
+        <p>
+          Predict future metro interstate traffic volume using weather
+          conditions and time-based features. This intelligent system helps
+          improve traffic management, congestion prediction and urban planning.
+        </p>
+
+        <a href="#prediction">
+          <button>
+            <i class="fas fa-chart-line"></i>
+
+            Predict Now
+          </button>
+        </a>
+      </div>
+
+      <div class="hero-right">
+        <i class="fas fa-car-side hero-icon"></i>
+      </div>
+    </section>
+
+    <!-- ================= ABOUT ================= -->
+
+    <section id="about" class="about">
+      <h2>About The Project</h2>
+
+      <p>
+        This project uses an LSTM (Long Short-Term Memory) Deep Learning model
+        to forecast future traffic volume by analyzing historical traffic
+        patterns, weather conditions and date-time information.
+      </p>
+    </section>
+
+    <!-- ================= FEATURES ================= -->
+
+    <section id="features" class="features">
+      <h2>Project Features</h2>
+
+      <div class="feature-container">
+        <div class="feature-card">
+          <i class="fas fa-brain"></i>
+
+          <h3>Deep Learning</h3>
+
+          <p>Built using LSTM Neural Network.</p>
+        </div>
+
+        <div class="feature-card">
+          <i class="fas fa-cloud-sun-rain"></i>
+
+          <h3>Weather Analysis</h3>
+
+          <p>Uses temperature, rain, snow and cloud information.</p>
+        </div>
+
+        <div class="feature-card">
+          <i class="fas fa-clock"></i>
+
+          <h3>Time Series</h3>
+
+          <p>Predicts traffic based on historical sequential data.</p>
+        </div>
+
+        <div class="feature-card">
+          <i class="fas fa-chart-area"></i>
+
+          <h3>Forecasting</h3>
+
+          <p>Predict future traffic volume accurately.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PREDICTION SECTION ================= -->
+
+    <section id="prediction" class="prediction-section">
+      <h2>Traffic Prediction</h2>
+
+      <form action="/predict" method="POST">
+        <div class="input-grid">
+          <div class="input-box">
+            <label>
+              <i class="fas fa-temperature-high"></i>
+
+              Temperature
+            </label>
+
+            <input
+              type="number"
+              step="any"
+              name="temp"
+              placeholder="Enter Temperature"
+              required
+            />
+          </div>
+
+          <div class="input-box">
+            <label>
+              <i class="fas fa-cloud-rain"></i>
+
+              Rain (1 Hour)
+            </label>
+
+            <input
+              type="number"
+              step="any"
+              name="rain"
+              placeholder="Enter Rain"
+              required
+            />
+          </div>
+
+          <div class="input-box">
+            <label>
+              <i class="far fa-snowflake"></i>
+
+              Snow (1 Hour)
+            </label>
+
+            <input
+              type="number"
+              step="any"
+              name="snow"
+              placeholder="Enter Snow"
+              required
+            />
+          </div>
+
+          <div class="input-box">
+            <label>
+              <i class="fas fa-cloud"></i>
+
+              Cloud Percentage
+            </label>
+
+            <input type="number" name="clouds" placeholder="0-100" required />
+          </div>
+
+          <div class="input-box">
+            <label>
+              <i class="fas fa-clock"></i>
+
+              Hour
+            </label>
+
+            <input type="number" name="hour" min="0" max="23" required />
+          </div>
+
+          <div class="input-box">
+            <label>
+              <i class="fas fa-calendar-day"></i>
+
+              Day
+            </label>
+
+            <input type="number" name="day" min="1" max="31" required />
+          </div>
+
+          <div class="input-box">
+            <label>
+              <i class="fas fa-calendar-alt"></i>
+
+              Month
+            </label>
+
+            <input type="number" name="month" min="1" max="12" required />
+          </div>
+
+          <div class="input-box">
+            <label>
+              <i class="fas fa-calendar"></i>
+
+              Year
+            </label>
+
+            <input type="number" name="year" required />
+          </div>
+        </div>
+
+        <button class="predict-btn">
+          <i class="fas fa-chart-line"></i>
+
+          Predict Traffic
+        </button>
+      </form>
+    </section>
+  </body>
+</html>
+<!-- ================= PREDICTION RESULT ================= -->
+
+{% if prediction_text %}
+
+<section class="result-section">
+
+    <h2>
+        <i class="fas fa-chart-bar"></i>
+        Prediction Result
+    </h2>
+
+    <div class="result-card">
+
+        <div class="result-icon">
+            <i class="fas fa-road"></i>
+        </div>
+
+        <div class="result-text">
+
+            <h3>Predicted Traffic Volume</h3>
+
+            <h1>{{ prediction_text }}</h1>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+<!-- ================= TRAFFIC STATUS ================= -->
+
+<section class="status-section">
+
+<h2>Traffic Status Levels</h2>
+
+<div class="status-container">
+
+<div class="status-card low">
+
+<i class="fas fa-car"></i>
+
+<h3>Low Traffic</h3>
+
+<p>0 - 2000 Vehicles</p>
+
+</div>
+
+<div class="status-card medium">
+
+<i class="fas fa-road"></i>
+
+<h3>Moderate Traffic</h3>
+
+<p>2001 - 4500 Vehicles</p>
+
+</div>
+
+<div class="status-card high">
+
+<i class="fas fa-traffic-light"></i>
+
+<h3>Heavy Traffic</h3>
+
+<p>Above 4500 Vehicles</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= WHY CHOOSE ================= -->
+
+<section class="why">
+
+<h2>
+
+Why Choose Our System?
+
+</h2>
+
+<div class="why-grid">
+
+<div class="why-box">
+
+<i class="fas fa-bolt"></i>
+
+<h3>Fast Prediction</h3>
+
+<p>
+
+Instant traffic forecasting using trained LSTM model.
+
+</p>
+
+</div>
+
+<div class="why-box">
+
+<i class="fas fa-chart-line"></i>
+
+<h3>High Accuracy</h3>
+
+<p>
+
+Deep Learning based forecasting for reliable prediction.
+
+</p>
+
+</div>
+
+<div class="why-box">
+
+<i class="fas fa-database"></i>
+
+<h3>Large Dataset</h3>
+
+<p>
+
+Trained using Metro Interstate Traffic Volume dataset.
+
+</p>
+
+</div>
+
+<div class="why-box">
+
+<i class="fas fa-laptop-code"></i>
+
+<h3>AI Powered</h3>
+
+<p>
+
+Built using TensorFlow, Flask and Python.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= TECHNOLOGIES ================= -->
+
+<section class="technology">
+
+<h2>
+
+Technologies Used
+
+</h2>
+
+<div class="tech-grid">
+
+<div>
+
+<i class="fab fa-python"></i>
+
+Python
+
+</div>
+
+<div>
+
+<i class="fas fa-brain"></i>
+
+TensorFlow
+
+</div>
+
+<div>
+
+<i class="fas fa-network-wired"></i>
+
+LSTM
+
+</div>
+
+<div>
+
+<i class="fab fa-html5"></i>
+
+HTML5
+
+</div>
+
+<div>
+
+<i class="fab fa-css3-alt"></i>
+
+CSS3
+
+</div>
+
+<div>
+
+<i class="fab fa-js"></i>
+
+JavaScript
+
+</div>
+
+<div>
+
+<i class="fas fa-fire"></i>
+
+Flask
+
+</div>
+
+<div>
+
+<i class="fas fa-database"></i>
+
+Pandas
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= CONTACT ================= -->
+
+<section id="contact" class="contact">
+
+<h2>
+
+Contact
+
+</h2>
+
+<div class="contact-container">
+
+<div>
+
+<i class="fas fa-user"></i>
+
+<h3>Developer</h3>
+
+<p>Deepika Jogi</p>
+
+</div>
+
+<div>
+
+<i class="fas fa-graduation-cap"></i>
+
+<h3>Department</h3>
+
+<p>Artificial Intelligence & Data Science</p>
+
+</div>
+
+<div>
+
+<i class="fas fa-university"></i>
+
+<h3>College</h3>
+
+<p>Dhaanish Chennai College of Engineering</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+<div class="footer-content">
+
+<h2>
+
+AI Powered Traffic Volume Forecasting
+
+</h2>
+
+<p>
+
+Deep Learning Based Prediction using LSTM Neural Network
+
+</p>
+
+<p>
+
+© 2026 All Rights Reserved
+
+</p>
+
+<p>
+
+Developed by <strong>Deepika Jogi</strong>
+
+</p>
+
+</div>
+
+</footer>
+
+<!-- Back to Top -->
+
+<button id="topBtn">
+
+<i class="fas fa-arrow-up"></i>
+
+</button>
+
+<!-- JavaScript -->
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
